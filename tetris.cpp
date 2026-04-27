@@ -149,8 +149,35 @@ int main()
             x = 5; y = 0; b = rand() % 7;
         }
         block2Board();
+
+int removeLine() {
+    int linesCleared = 0;
+    for (int i = H - 2; i > 0; i--) {
+        bool isFull = true;
+        for (int j = 1; j < W - 1; j++) {
+            if (board[i][j] == ' ') { // Nếu có ô trống thì hàng chưa đầy
+                isFull = false;
+                break;
+            }
+        }
+
+        if (isFull) {
+            linesCleared++;
+            for (int k = i; k > 1; k--) {
+                for (int j = 1; j < W - 1; j++) {
+                    board[k][j] = board[k-1][j];
+                }
+            }
+            for (int j = 1; j < W - 1; j++) board[1][j] = ' ';
+            i++; 
+        }
+    }
+    return linesCleared; 
+}
+
         draw();
         _sleep(200);
     }
     return 0;
 }
+
