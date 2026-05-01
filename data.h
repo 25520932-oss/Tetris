@@ -29,6 +29,10 @@ extern Block blocks[BLOCK_COUNT];
 extern int x, y;
 extern BlockType currentBlock;
 
+// ĐIỂM SỐ & TỐC ĐỘ
+extern int score;   // tổng số dòng đã xóa
+extern int level;   // cấp độ hiện tại (tăng mỗi 10 dòng)
+
 // kHỞI TẠO BẢNG
 void initBlocks(); 
 void initBoard(); 
