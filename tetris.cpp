@@ -5,67 +5,43 @@ using namespace std;
 #define H 20
 #define W 15
 char board[H][W] = {} ;
+//Can bang ti le xuat hien cua cac khoi
 char blocks[][4][4] = {
         {{' ','I',' ',' '},
          {' ','I',' ',' '},
          {' ','I',' ',' '},
          {' ','I',' ',' '}},
-        {{' ','I',' ',' '},
-         {' ','I',' ',' '},
-         {' ','I',' ',' '},
-         {' ','I',' ',' '}},
+
         {{' ',' ',' ',' '},
          {' ','O','O',' '},
          {' ','O','O',' '},
          {' ',' ',' ',' '}},
-        {{' ',' ',' ',' '},
-         {' ','O','O',' '},
-         {' ','O','O',' '},
-         {' ',' ',' ',' '}},
-        {{' ',' ',' ',' '},
-         {' ','O','O',' '},
-         {' ','O','O',' '},
-         {' ',' ',' ',' '}},
-        {{' ',' ',' ',' '},
-         {' ','O','O',' '},
-         {' ','O','O',' '},
-         {' ',' ',' ',' '}},
-        {{' ',' ',' ',' '},
-         {' ','O','O',' '},
-         {' ','O','O',' '},
-         {' ',' ',' ',' '}},
-        {{' ',' ',' ',' '},
-         {' ','O','O',' '},
-         {' ','O','O',' '},
-         {' ',' ',' ',' '}},
-        {{' ',' ',' ',' '},
-         {' ','O','O',' '},
-         {' ','O','O',' '},
-         {' ',' ',' ',' '}},
+
         {{' ',' ',' ',' '},
          {'I','I','I','I'},
          {' ',' ',' ',' '},
          {' ',' ',' ',' '}},
-        {{' ',' ',' ',' '},
-         {' ','O','O',' '},
-         {' ','O','O',' '},
-         {' ',' ',' ',' '}},
+
         {{' ',' ',' ',' '},
          {' ','T',' ',' '},
          {'T','T','T',' '},
          {' ',' ',' ',' '}},
+
         {{' ',' ',' ',' '},
          {' ','S','S',' '},
          {'S','S',' ',' '},
          {' ',' ',' ',' '}},
+
         {{' ',' ',' ',' '},
          {'Z','Z',' ',' '},
          {' ','Z','Z',' '},
          {' ',' ',' ',' '}},
+
         {{' ',' ',' ',' '},
          {'J',' ',' ',' '},
          {'J','J','J',' '},
          {' ',' ',' ',' '}},
+
         {{' ',' ',' ',' '},
          {' ',' ','L',' '},
          {'L','L','L',' '},
@@ -80,26 +56,36 @@ void gotoxy(int x, int y) {
 void boardDelBlock(){
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
-            if (blocks[b][i][j] != ' ' && y+j < H)
-                board[y+i][x+j] = ' ';
+            if (blocks[b][i][j] != ' '){
+                int tx = x + j;
+                int ty = y + i;
+                if (tx > 0 && tx < W-1 && ty > 0 && ty < H-1)
+                    board[ty][tx] = ' ';
+            }
 }
 void block2Board(){
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
-            if (blocks[b][i][j] != ' ' )
-                board[y+i][x+j] = blocks[b][i][j];
+            if (blocks[b][i][j] != ' ' ){
+                int tx = x + j;
+                int ty = y + i;
+                if (tx > 0 && tx < W-1 && ty > 0 && ty < H-1)
+                    board[ty][tx] = (char)176;
+            }
 }
 void initBoard(){
     for (int i = 0 ; i < H ; i++)
         for (int j = 0 ; j < W ; j++)
-            if ((i==H-1) || (j==0) || (j == W-1)) board[i][j] = '#';
+            if ((i==0) ||(i==H-1) || (j==0) || (j == W-1)) board[i][j] = (char) 178;// doi khung thanh dang khoi
             else board[i][j] = ' ';
 }
 void draw(){
     gotoxy(0,0);
     for (int i = 0 ; i < H ; i++, cout<<endl)
         for (int j = 0 ; j < W ; j++)
-            cout<<board[i][j];
+            cout<<board[i][j]<<board[i][j];
+            /*In 2 lan de can doi ti le khoi
+            Kich thuoc co ban cua khoi la 1920 x 1080 */
 }
 bool canMove(int dx, int dy){
     for (int i = 0 ; i < 4 ; i++)
@@ -118,7 +104,7 @@ void removeLine(){
         for (j = 0; j < W-1 ; j++)
             if (board[i][j] == ' ') break;
         if (j == W-1){
-            for (int ii = i; ii >0 ; ii-- )
+            for (int ii = i; ii >1 ; ii-- )
                 for (int j = 0; j < W-1 ; j++ ) board[ii][j] = board[ii-1][j];
             i++;
             draw();
