@@ -72,7 +72,18 @@ char blocks[][4][4] = {
          {' ',' ',' ',' '}}
 };
 
-int x=4,y=0,b=1;
+
+int x=4, y=0, b=1;
+
+
+int score = 0; 
+int level = 0; 
+
+int getDelay() {
+    if (level >= 11) return 80;
+    return 300 - (level * 20);
+}
+
 void gotoxy(int x, int y) {
     COORD c = {x, y};
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
@@ -112,50 +123,13 @@ bool canMove(int dx, int dy){
             }
     return true;
 }
-void removeLine(){
-    int j;
-    for (int i = H-2; i >0 ; i-- ){
-        for (j = 0; j < W-1 ; j++)
-            if (board[i][j] == ' ') break;
-        if (j == W-1){
-            for (int ii = i; ii >0 ; ii-- )
-                for (int j = 0; j < W-1 ; j++ ) board[ii][j] = board[ii-1][j];
-            i++;
-            draw();
-            _sleep(200);
-        }
-    }
-}
-
-int main()
-{
-    srand(time(0));
-    b = rand() % 7;
-    system("cls");
-    initBoard();
-    while (1){
-        boardDelBlock();
-        if (kbhit()){
-            char c = getch();
-            if (c=='a' && canMove(-1,0)) x--;
-            if (c=='d' && canMove(1,0) ) x++;
-            if (c=='x' && canMove(0,1))  y++;
-            if (c=='q') break;
-        }
-        if (canMove(0,1)) y++;
-        else {
-            block2Board();
-            removeLine();
-            x = 5; y = 0; b = rand() % 7;
-        }
-        block2Board();
 
 int removeLine() {
     int linesCleared = 0;
     for (int i = H - 2; i > 0; i--) {
         bool isFull = true;
         for (int j = 1; j < W - 1; j++) {
-            if (board[i][j] == ' ') { // Nếu có ô trống thì hàng chưa đầy
+            if (board[i][j] == ' ') { 
                 isFull = false;
                 break;
             }
@@ -175,8 +149,44 @@ int removeLine() {
     return linesCleared; 
 }
 
+
+int main()
+{
+    srand(time(0));
+    b = rand() % 7;
+    // system("cls"); // Lưu ý: Nếu máy Mac chạy lỗi dòng này thì comment nó lại nhé
+    initBoard();
+    
+    while (1){
+        boardDelBlock();
+        if (kbhit()){
+            char c = getch();
+            if (c=='a' && canMove(-1,0)) x--;
+            if (c=='d' && canMove(1,0) ) x++;
+            if (c=='x' && canMove(0,1))  y++;
+            if (c=='q') break;
+        }
+        
+        if (canMove(0,1)) {
+            y++;
+        } else {
+            block2Board();
+            
+            // Xử lý tính điểm và tăng level
+            int lines = removeLine();
+            if (lines > 0) {
+                score += lines;
+                level = score / 10;
+            }
+            
+            x = 5; y = 0; b = rand() % 7;
+        }
+        
+        block2Board();
         draw();
-        _sleep(200);
+        
+        // Gọi hàm getDelay() thay vì 200 cứng
+        _sleep(getDelay()); 
     }
     return 0;
 }
