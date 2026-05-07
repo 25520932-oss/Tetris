@@ -2,14 +2,14 @@
 
 // XÓA BOARD
 void clearBoard() {
-    for (int i = 0; i < H; i++)
-        for (int j = 0; j < W; j++)
+    for (int i = 0; i < BOARD_HEIGHT; i++)
+        for (int j = 0; j < BOARD_WIDTH; j++)
             board[i][j] = ' ';
 }
 
 // TRONG BIÊN?
 bool isInside(int x, int y) {
-    return (x >= 0 && x < H && y >= 0 && y < W);
+    return (x >= 0 && x < BOARD_HEIGHT && y >= 0 && y < BOARD_WIDTH);
 }
 
 
