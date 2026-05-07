@@ -41,5 +41,32 @@ bool canMove(int dx, int dy){
 
 // XÓA DÒNG ĐẦY — trả về số dòng đã xóa
 int removeLine() {
+    int count = 0;
+    for (int i = H - 2; i >= 1; i--) {
+        bool isFull = true;
+        for (int j = 1; j < W - 1; j++) {
+            if (board[i][j] == ' ') {
+                isFull = false;
+                break;
+            }
+        }
+
+        if (isFull) {
+            count++;
+            for (int k = i; k > 1; k--) {
+                for (int j = 1; j < W - 1; j++) {
+                    board[k][j] = board[k-1][j];
+                }
+            }
+            for (int j = 1; j < W - 1; j++) board[1][j] = ' ';
+            i++; // Kiểm tra lại dòng hiện tại sau khi xóa
+
+            score += count;
+            level = score / 10 + 1; // Tăng level mỗi 10 điểm
+
+            return count;
+
+        }
+    }
  
 }
