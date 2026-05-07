@@ -6,7 +6,7 @@
 // TẠO BLOCK MỚI
 void spawnBlock() {
     currentBlock = (BlockType)(rand() % BLOCK_COUNT);
-    x = BOARD_WIDTH / 2 - 2;  // FIX: x là cột (ngang), spawn ở giữa board
+    x = W / 2 - 2;  // FIX: x là cột (ngang), spawn ở giữa board
     y = 0;           // FIX: y là hàng (dọc), spawn ở trên cùng
 }
 
