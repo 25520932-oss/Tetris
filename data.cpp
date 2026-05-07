@@ -1,9 +1,7 @@
 #include "data.h"
-int score = 0;
-int level = 0;
 
 // BẢNG
-char board[BOARD_HEIGHT][BOARD_WIDTH];
+char board[H][W];
 
 
 // BLOCKS (7 KHỐI)
@@ -19,9 +17,9 @@ int level = 0;
 
 //TẠO BẢNG
 void initBoard() {
-    for (int i = 0; i < BOARD_HEIGHT; i++) {
-        for (int j = 0; j < BOARD_WIDTH; j++) {
-            if (i == BOARD_HEIGHT - 1 || j == 0 || j == BOARD_WIDTH - 1)
+    for (int i = 0; i < H; i++) {
+        for (int j = 0; j < W; j++) {
+            if (i == H - 1 || j == 0 || j == W - 1)
                 board[i][j] = (char)178;//đổi thành dạng khối đậm
             else
                 board[i][j] = ' ';
