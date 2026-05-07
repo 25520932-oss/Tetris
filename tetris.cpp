@@ -29,6 +29,7 @@ int main() {
             // lockBlock() chỉ cần gọi khi block KHÔNG di chuyển được (chạm đáy)
             lockBlock();
 
+
             removeLine();
 
             spawnBlock();
