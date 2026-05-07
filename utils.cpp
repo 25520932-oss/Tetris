@@ -1,5 +1,11 @@
 #include "utils.h"
+#include <iostream>
+
+#define byte win_byte_override
 #include <windows.h>
+#undef byte
+
+using namespace std;
 #include <ctime>
 #include <cstdlib>
 

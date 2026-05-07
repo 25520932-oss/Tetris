@@ -1,6 +1,10 @@
 #include "game.h"
 #include <iostream>
+
+#define byte win_byte_override
 #include <windows.h>
+#undef byte
+
 using namespace std;
 
 
@@ -9,7 +13,7 @@ using namespace std;
 void boardDelBlock(){
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
-            if (blocks[currentBlock].shape[i][j] != ' ' && y+i < H)
+            if (blocks[currentBlock].shape[i][j] != ' ' && y+i < BOARD_HEIGHT)
                 board[y+i][x+j] = ' ';
 }
 
@@ -18,7 +22,7 @@ void block2Board(){
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
             if (blocks[currentBlock].shape[i][j] != ' ')
-                board[y+i][x+j] = blocks[currentBlock].shape[i][j];
+                board[y+i][x+j] = (char)176;//đổi thành dạng khối mờ
 }
 
 // KIỂM TRA DI CHUYỂN
@@ -30,7 +34,7 @@ bool canMove(int dx, int dy){
                 int ty = y + i + dy;
 
                 // FIX: thêm ty < 0 để kiểm tra biên trên
-                if (tx < 1 || tx >= W - 1 || ty < 0 || ty >= H - 1)
+                if (tx < 1 || tx >= BOARD_WIDTH - 1 || ty < 0 || ty >= BOARD_HEIGHT - 1)
                     return false;
 
                 if (board[ty][tx] != ' ')
@@ -42,9 +46,9 @@ bool canMove(int dx, int dy){
 // XÓA DÒNG ĐẦY — trả về số dòng đã xóa
 int removeLine() {
     int count = 0;
-    for (int i = H - 2; i >= 1; i--) {
+    for (int i = BOARD_HEIGHT - 2; i >= 1; i--) {
         bool isFull = true;
-        for (int j = 1; j < W - 1; j++) {
+        for (int j = 1; j < BOARD_WIDTH - 1; j++) {
             if (board[i][j] == ' ') {
                 isFull = false;
                 break;
@@ -54,11 +58,11 @@ int removeLine() {
         if (isFull) {
             count++;
             for (int k = i; k > 1; k--) {
-                for (int j = 1; j < W - 1; j++) {
+                for (int j = 1; j < BOARD_WIDTH - 1; j++) {
                     board[k][j] = board[k-1][j];
                 }
             }
-            for (int j = 1; j < W - 1; j++) board[1][j] = ' ';
+            for (int j = 1; j < BOARD_WIDTH - 1; j++) board[1][j] = ' ';
             i++; // Kiểm tra lại dòng hiện tại sau khi xóa
 
             score += count;
@@ -68,5 +72,5 @@ int removeLine() {
 
         }
     }
- 
+
 }
