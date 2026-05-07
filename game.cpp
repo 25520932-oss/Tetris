@@ -39,7 +39,7 @@ bool canMove(int dx, int dy){
     return true;
 }
 
-// XÓA DÒNG ĐẦY — trả về số dòng đã xóa
+// XÓA DÒNG ĐẦY — trả về số dòng đã xóa - tăng tốc mỗi lần xóa
 int removeLine() {
  
 }

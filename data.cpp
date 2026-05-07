@@ -11,6 +11,10 @@ Block blocks[BLOCK_COUNT];
 int x = 4, y = 0; //BLOCK RƠI Ở CHÍNH GIỮA
 BlockType currentBlock = I;
 
+// ĐIỂM SỐ & TỐC ĐỘ
+int score = 0;
+int level = 0;
+
 //TẠO BẢNG
 void initBoard() {
     for (int i = 0; i < H; i++) {

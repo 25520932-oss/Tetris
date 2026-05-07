@@ -10,7 +10,7 @@ void block2Board();
 // LOGIC
 bool canMove(int dx, int dy);
 
-// XÓA DÒNG
+// XÓA DÒNG - tăng tốc
 int removeLine();
 
 #endif
