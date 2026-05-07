@@ -5,9 +5,8 @@
 using namespace std;
 
 // KÍCH THƯỚC BOARD
-// Thay vì dùng H và W
-#define BOARD_HEIGHT 20
-#define BOARD_WIDTH 15
+#define H 20
+#define W 15
 
 
 // LOẠI KHỐI TETRIS
@@ -21,7 +20,7 @@ struct Block {
 };
 
 // BOARD GAME
-extern char board[BOARD_HEIGHT][BOARD_WIDTH];
+extern char board[H][W];
 
 // BLOCK DATA
 extern Block blocks[BLOCK_COUNT];

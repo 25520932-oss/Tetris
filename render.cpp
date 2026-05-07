@@ -20,7 +20,7 @@ void gotoxy(int x, int y) {
 // VẼ BOARD + BLOCK
 void render() {
      gotoxy(0,0);
-    for (int i = 0 ; i < BOARD_HEIGHT ; i++, cout<<endl)
-        for (int j = 0 ; j < BOARD_WIDTH ; j++)
+    for (int i = 0 ; i < H ; i++, cout<<endl)
+        for (int j = 0 ; j < W ; j++)
             cout<<board[i][j]<<board[i][j];
 }
