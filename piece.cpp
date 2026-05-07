@@ -12,7 +12,17 @@ void spawnBlock() {
 
 // DI CHUYỂN BLOCK
 bool moveBlock(int dx, int dy) {
-
+    boardDelBlock();           // Xóa vị trí cũ khỏi board
+ 
+    if (canMove(dx, dy)) {
+        x += dx;               // Cập nhật cột
+        y += dy;               // Cập nhật hàng
+        block2Board();         // Vẽ lại vị trí mới
+        return true;
+    }
+ 
+    block2Board();             // Không di chuyển được, vẽ lại vị trí cũ
+    return false;
 }
 
 // XOAY BLOCK (xoay 90 độ theo chiều kim đồng hồ)

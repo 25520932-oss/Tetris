@@ -13,7 +13,7 @@ BlockType currentBlock = I;
 
 // ĐIỂM SỐ & TỐC ĐỘ
 int score = 0;
-int level = 0;
+int level = 1;
 
 //TẠO BẢNG
 void initBoard() {
