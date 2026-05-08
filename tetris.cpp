@@ -13,7 +13,7 @@ int main() {
     initBlocks();   // tạo shape các khối
 
     spawnBlock();   // block đầu tiên
-    block2Board();  // FIX: vẽ block đầu tiên lên board
+    block2Board();  // vẽ block đầu tiên lên board
 
     // GAME LOOP
     while (true) {
@@ -24,7 +24,7 @@ int main() {
         processInput();
 
         // LOGIC RƠI
-        if (!moveBlock(1, 0)) {
+        if (!moveBlock(0, 1)) {
             // FIX: moveBlock đã gọi block2Board() bên trong,
             // lockBlock() chỉ cần gọi khi block KHÔNG di chuyển được (chạm đáy)
             lockBlock();
