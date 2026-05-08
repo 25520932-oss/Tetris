@@ -5,8 +5,8 @@
 using namespace std;
 
 // KÍCH THƯỚC BOARD
-#define H 20
-#define W 15
+const int H = 10;
+const int W = 20;
 
 
 // LOẠI KHỐI TETRIS
