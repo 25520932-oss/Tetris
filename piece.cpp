@@ -3,6 +3,21 @@
 #include "game.h"
 #include <cstdlib>
 
+//ghost block
+int calcGhostY() {
+
+}
+
+//Tạo block đầu tiên
+void spawnFirst() {
+    currentBlock = (BlockType)(rand() % BLOCK_COUNT);
+    nextBlock    = (BlockType)(rand() % BLOCK_COUNT);
+    rotation = 0;
+    x = W / 2 - 2;
+    y = 0;
+    hasHeld = false;
+}
+
 // TẠO BLOCK MỚI
 void spawnBlock() {
     currentBlock = (BlockType)(rand() % BLOCK_COUNT);
@@ -27,10 +42,14 @@ bool moveBlock(int dx, int dy) {
 
 // XOAY BLOCK (xoay 90 độ theo chiều kim đồng hồ)
 void rotateBlock() {
-    // Tạo shape mới sau khi xoay
+   
 
 }
 
+//Giữ block vào kho 
+void holdBlock() {
+    
+}
 // GHIM BLOCK VÀO BOARD
 void lockBlock() {
     block2Board();
