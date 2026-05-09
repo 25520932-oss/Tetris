@@ -31,7 +31,11 @@ void processInput() {
         case 'W':
             rotateBlock();
             break;
-
+        //HOLD
+        case 'c': 
+        case 'C': 
+            holdBlock();
+            break;
         // Đưa khối xuống đáy ngay
         case ' ':
             while (moveBlock(0, 1));  // FIX: dy=+1
