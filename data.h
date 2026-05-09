@@ -5,13 +5,14 @@
 using namespace std;
 
 // KÍCH THƯỚC BOARD
-const int H = 10;
-const int W = 20;
+const int H = 22;
+const int W = 12;
 
 
 // LOẠI KHỐI TETRIS
 enum BlockType {
-    I, O, T, S, Z, J, L, BLOCK_COUNT
+    I, O, T, S, Z, J, L, BLOCK_COUNT,
+    NONE = -1
 };
 
 // STRUCT KHỐI
@@ -26,8 +27,13 @@ extern char board[H][W];
 extern Block blocks[BLOCK_COUNT];
 
 // BIẾN TRẠNG THÁI
-extern int x, y;
+extern int x, y;              // vị trí block hiện tại (cột, hàng)
+extern int ghostY;            // hàng ghost block
+extern int rotation;          // góc xoay 0-3
 extern BlockType currentBlock;
+extern BlockType nextBlock;
+extern BlockType heldBlock;
+extern bool hasHeld;          // đã hold trong lượt này chưa
 
 // ĐIỂM SỐ & TỐC ĐỘ
 extern int score;   // tổng số dòng đã xóa
