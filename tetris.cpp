@@ -5,6 +5,14 @@
 #include "render.h"
 #include "utils.h"
 
+bool GameOver(){
+    for (int i = 0 ; i < 4 ; i++)
+        for (int j = 0 ; j < 4 ; j++)
+            if (blocks[currentBlock].shape[i][j] != ' ')
+                if(board[y+i][x+j]!=' ') return true;
+    return false;
+}
+
 int main() {
 
     // KHỞI TẠO
@@ -33,13 +41,16 @@ int main() {
             removeLine();
 
             spawnBlock();
+            if(GameOver()) break;
             block2Board(); // FIX: vẽ block mới lên board ngay sau khi spawn
+
         }
 
         // DELAY — tốc độ tăng dần theo level (tối thiểu 80ms)
         int speed = max(80, 300 - level * 20);
         delay(speed);
     }
-
+    gotoxy(23,0);
+    cout<<"GAME OVER!";
     return 0;
 }
