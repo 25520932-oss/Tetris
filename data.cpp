@@ -24,7 +24,7 @@ int level = 1;
 void initBoard() {
     for (int i = 0; i < H; i++) {
         for (int j = 0; j < W; j++) {
-            if (i == H - 1 || j == 0 || j == W - 1)
+            if (i == H - 1 || j == 0 || j == W - 1|| i == 0)
                 board[i][j] = (char)178;//đổi thành dạng khối đậm
             else
                 board[i][j] = ' ';
