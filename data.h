@@ -39,6 +39,7 @@ extern bool hasHeld;          // đã hold trong lượt này chưa
 // ĐIỂM SỐ & TỐC ĐỘ
 extern int score;   // tổng số dòng đã xóa
 extern int level;   // cấp độ hiện tại (tăng mỗi 10 dòng)
+extern int highScore; // điểm cao nhất
 
 // kHỞI TẠO BẢNG
 void initBlocks();

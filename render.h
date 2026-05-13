@@ -9,4 +9,12 @@ void render();
 
 //Vẽ 4 block tiếp theo
 void renderNextQueue();
+
+//Vẽ khung hiển thị điểm hiện tại
+void renderScore();
+
+//Vẽ khung hiển thị điểm cao nhất
+void renderHighScore();
+
 #endif
+

@@ -1,6 +1,7 @@
 #include "render.h"
 #include "data.h"
 #include <iostream>
+#include <string>
 
 #define byte win_byte_override
 #include <windows.h>
@@ -73,15 +74,94 @@ void renderNextQueue() {
     cout << (char)188;  // ╝
 }
 
-// VẼ BOARD + BLOCK
+//Khung hiển thị điểm
+void renderScore() {
+    const int offsetX = W * 2 + 2; 
+    const int offsetY = 1;
+    
+    // Tính toán vị trí khung SCORE nằm dưới khung NEXT
+    int scoreOffsetY = offsetY + 2 + NEXT_COUNT * 5 + 1; 
+
+    // Tiêu đề
+    gotoxy(scoreOffsetY, offsetX);
+    cout << "SCORE";
+
+    // Vẽ đường viền trên (Tự vẽ bằng cout để khỏi cần hàm phụ)
+    gotoxy(scoreOffsetY + 1, offsetX);
+    cout << (char)201;  // ╔
+    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
+    cout << (char)187;  // ╗
+
+    // Vẽ nội dung điểm
+    gotoxy(scoreOffsetY + 2, offsetX);
+    cout << (char)186;  // ║
+    
+    // Ghi con số điểm hiện tại (Giả định biến 'score' đã có trong data.h)
+    string scoreStr = to_string(score); 
+    cout << " " << scoreStr;
+    
+    // Bơm thêm khoảng trắng cho vừa khung
+    int padding = 20 - 1 - scoreStr.length();
+    for(int i = 0; i < padding; i++) cout << " ";
+    cout << (char)186;  // ║
+
+    // Vẽ đường viền dưới (Tự vẽ bằng cout)
+    gotoxy(scoreOffsetY + 3, offsetX);
+    cout << (char)200;  // ╚
+    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
+    cout << (char)188;  // ╝
+}
+void renderHighScore() {
+    const int offsetX = W * 2 + 2; 
+    const int offsetY = 1;
+    
+    // Tính toán vị trí khung SCORE
+    int scoreOffsetY = offsetY + 2 + NEXT_COUNT * 5 + 1; 
+    
+    // Đặt khung HIGH SCORE nằm dưới khung SCORE một khoảng nhỏ
+    int highScoreOffsetY = scoreOffsetY + 5; 
+
+    // Tiêu đề
+    gotoxy(highScoreOffsetY, offsetX);
+    cout << "HIGH SCORE";
+
+    // Vẽ đường viền trên 
+    gotoxy(highScoreOffsetY + 1, offsetX);
+    cout << (char)201;  // ╔
+    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
+    cout << (char)187;  // ╗
+
+    // Vẽ nội dung điểm cao nhất
+    gotoxy(highScoreOffsetY + 2, offsetX);
+    cout << (char)186;  // ║
+    
+    // Ghi con số điểm cao nhất (Giả định biến 'highScore' đã có trong data.h)
+    string highScoreStr = to_string(highScore); 
+    cout << " " << highScoreStr;
+    
+    // Bơm thêm khoảng trắng cho vừa khung
+    int padding = 20 - 1 - highScoreStr.length();
+    for(int i = 0; i < padding; i++) cout << " ";
+    cout << (char)186;  // ║
+
+    // Vẽ đường viền dưới
+    gotoxy(highScoreOffsetY + 3, offsetX);
+    cout << (char)200;  // ╚
+    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
+    cout << (char)188;  // ╝
+}
+
+// VẼ BOARD + BLOCK + SCORE + HIGH SCORE
 void render() {
     // Ẩn con trỏ (chỉ cần gọi 1 lần khi khởi tạo)
     CONSOLE_CURSOR_INFO ci = {1, FALSE};
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ci);
-     gotoxy(0,0);
+    gotoxy(0,0);
     for (int i = 0 ; i < H ; i++, cout<<endl)
         for (int j = 0 ; j < W ; j++)
             cout<<board[i][j]<<board[i][j];
     
     renderNextQueue();
+    renderScore();
+    renderHighScore();
 }
