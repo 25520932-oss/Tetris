@@ -32,9 +32,9 @@ void processInput() {
             rotateBlock();
             break;
         //HOLD
-        case 'c': 
-        case 'C': 
-            holdBlock();
+        case 'c':
+        case 'C':
+            //holdBlock();
             break;
         // Đưa khối xuống đáy ngay
         case ' ':
