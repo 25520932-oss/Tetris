@@ -9,7 +9,6 @@ Block blocks[BLOCK_COUNT];
 
 // BIẾN BAN ĐẦU
 int x = 4, y = 0; //BLOCK RƠI Ở CHÍNH GIỮA
-int x = 4, y = 0;
 int ghostY = 0;
 int rotation = 0;
 BlockType currentBlock = I;

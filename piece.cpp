@@ -6,6 +6,7 @@
 //ghost block
 int calcGhostY() {
 
+    return 0; //return tam
 }
 
 //Tạo block đầu tiên
