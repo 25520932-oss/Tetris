@@ -12,7 +12,8 @@ int calcGhostY() {
 //Tạo block đầu tiên
 void spawnFirst() {
     currentBlock = (BlockType)(rand() % BLOCK_COUNT);
-    nextBlock    = (BlockType)(rand() % BLOCK_COUNT);
+    for (int i = 0; i < NEXT_COUNT; i++)
+        nextQueue[i] = (BlockType)(rand() % BLOCK_COUNT);
     rotation = 0;
     x = W / 2 - 2;
     y = 0;
@@ -22,6 +23,9 @@ void spawnFirst() {
 // TẠO BLOCK MỚI
 void spawnBlock() {
     currentBlock = (BlockType)(rand() % BLOCK_COUNT);
+     for (int i = 0; i < NEXT_COUNT - 1; i++)
+        nextQueue[i] = nextQueue[i + 1];     // dịch queue lên 1
+    nextQueue[NEXT_COUNT - 1] = (BlockType)(rand() % BLOCK_COUNT); // thêm block mới
     x = W / 2 - 2;  // FIX: x là cột (ngang), spawn ở giữa board
     y = 0;           // FIX: y là hàng (dọc), spawn ở trên cùng
 }

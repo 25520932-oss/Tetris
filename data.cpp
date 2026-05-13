@@ -12,7 +12,7 @@ int x = 4, y = 0; //BLOCK RƠI Ở CHÍNH GIỮA
 int ghostY = 0;
 int rotation = 0;
 BlockType currentBlock = I;
-BlockType nextBlock = O;
+BlockType nextQueue[NEXT_COUNT] = {O, T, S, Z};  // giá trị mặc định
 BlockType heldBlock = NONE;
 bool hasHeld = false;
 

@@ -31,7 +31,8 @@ extern int x, y;              // vị trí block hiện tại (cột, hàng)
 extern int ghostY;            // hàng ghost block
 extern int rotation;          // góc xoay 0-3
 extern BlockType currentBlock;
-extern BlockType nextBlock;
+const int NEXT_COUNT = 4;
+extern BlockType nextQueue[NEXT_COUNT];   // hàng đợi 4 block tiếp theo
 extern BlockType heldBlock;
 extern bool hasHeld;          // đã hold trong lượt này chưa
 

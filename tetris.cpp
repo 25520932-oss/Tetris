@@ -27,7 +27,6 @@ int main() {
     while (true) {
 
         render();
-
         // INPUT
         processInput();
 
