@@ -18,6 +18,8 @@ void spawnBlock();
 // DI CHUYỂN BLOCK
 bool moveBlock(int dx, int dy);
 
+bool checkCollision(int nextx, int nexty);
+
 // XOAY BLOCK
 void rotateBlock();
 
@@ -26,5 +28,6 @@ void holdBlock();
 
 // GHIM BLOCK VÀO BOARD
 void lockBlock();
+
 
 #endif

@@ -5,6 +5,8 @@
 #include "render.h"
 #include "utils.h"
 
+int highScore = 0;
+
 bool GameOver(){
     for (int i = 0 ; i < 4 ; i++)
         for (int j = 0 ; j < 4 ; j++)
