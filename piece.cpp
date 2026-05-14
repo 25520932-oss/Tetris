@@ -115,7 +115,50 @@ void rotateBlock() {
 
 //Giữ block vào kho 
 void holdBlock() {
+    int nextB;           // Khối sẽ xuất hiện tiếp theo
+    int holdB = -1;      // Khối đang được giữ (-1 nghĩa là kho đang trống)
+    bool canHold = true; // Biến kiểm soát: chỉ cho phép Hold 1 lần mỗi lượt rơi
+    if (!canHold) return; // Nếu đã dùng Hold trong lượt này rồi thì thoát
+
+    boardDelBlock(); // 1. Xóa hình ảnh khối hiện tại đang ở vị trí x, y trên board
+
+    if (holdB == -1) {
+        // TRƯỜNG HỢP 1: Chưa có khối nào trong kho Hold
+        holdB = b;          // Đưa khối hiện tại vào kho
+        b = nextB;          // Lấy khối Next ra để chơi
+        nextB = rand() % 7; // Tạo mới khối Next tiếp theo
+    } else {
+        // TRƯỜNG HỢP 2: Đã có khối trong kho Hold
+        int temp = b;       // Hoán đổi khối hiện tại và khối trong kho
+        b = holdB;
+        holdB = temp;
+    }
+
+    // 2. Reset vị trí khối mới về đỉnh bàn cờ
+    x = 4; 
+    y = 0; 
+
+    // 3. Khóa tính năng Hold lại cho đến khi khối này chạm đáy
+    canHold = false;
+
+    if (kbhit()) {
+    char c = getch();
+    if (c == 'c' || c == 'C') {
+        holdBlock(); // Gọi hàm khi người chơi nhấn phím C
+    }
+    // ... các phím di chuyển khác ...
+    } else {
+    block2Board();
+    removeLine(); // Logic xóa hàng (độc lập)
+
+    // Chuẩn bị cho lượt mới
+    b = nextB;
+    nextB = rand() % 7;
+    x = 4; y = 0;
     
+    canHold = true; // QUAN TRỌNG: Mở khóa Hold tại đây
+}
+
 }
 // GHIM BLOCK VÀO BOARD
 void lockBlock() {
