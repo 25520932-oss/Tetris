@@ -3,31 +3,15 @@
 
 #include "data.h"
 
-// Lấy shape đã xoay
-void getRotatedShape(BlockType type, int rot, char out[4][4]);
-
-// Tính vị trí ghost
-int calcGhostY();
-
-// Spawn block đầu tiên (khởi tạo cả current + next)
-void spawnFirst();
-
-// Spawn block tiếp theo (lấy next, sinh next mới)
+// Spawn block đầu tiên (khởi tạo current + toàn bộ next queue)
 void spawnBlock();
 
-// DI CHUYỂN BLOCK
+// Di chuyển block (dx: delta cột, dy: delta hàng)
+// Trả về true nếu di chuyển thành công
 bool moveBlock(int dx, int dy);
 
-bool checkCollision(int nextx, int nexty);
-
-// XOAY BLOCK
+// Xoay block 90° theo chiều kim đồng hồ
+// Tự hoàn tác nếu sau xoay bị va chạm
 void rotateBlock();
-
-// Hold block
-void holdBlock();
-
-// GHIM BLOCK VÀO BOARD
-void lockBlock();
-
 
 #endif

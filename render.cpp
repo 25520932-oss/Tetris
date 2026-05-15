@@ -1,5 +1,6 @@
 #include "render.h"
 #include "data.h"
+#include "piece_class.h"
 #include <iostream>
 #include <string>
 
@@ -9,158 +10,85 @@
 
 using namespace std;
 
-// DI CHUYỂN CON TRỎ
-void gotoxy(int x, int y) {
-    COORD coord;
-    coord.X = y;
-    coord.Y = x;
+void gotoxy(int row, int col) {
+    COORD coord = { (SHORT)col, (SHORT)row };
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-
-// Khung nằm bên phải board, bắt đầu tại cột W*2 + 2
 void renderNextQueue() {
-    // Board được vẽ mỗi ô 2 ký tự ngang, nên offset X = W*2 + 2
-    const int offsetX = W * 2 + 2;  // cột bắt đầu khung NEXT (tính theo console column)
-    const int offsetY = 1;           // hàng bắt đầu
+    const int offCol = W * 2 + 2;
+    const int offRow = 1;
 
-    // Tiêu đề
-    gotoxy(offsetY, offsetX);
+    gotoxy(offRow, offCol);
     cout << "NEXT";
 
-    // Vẽ đường viền trên
-    gotoxy(offsetY + 1, offsetX);
-    cout << (char)201;  // ╔
-    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;  // ══
-    cout << (char)187;  // ╗
+    gotoxy(offRow + 1, offCol);
+    cout << (char)201;
+    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
+    cout << (char)187;
 
-    // Vẽ từng block trong queue
     for (int k = 0; k < NEXT_COUNT; k++) {
         BlockType type = nextQueue[k];
-
-        // 4 hàng shape + 1 hàng trống ngăn cách
         for (int i = 0; i < 4; i++) {
-            int row = offsetY + 2 + k * 5 + i;  // mỗi block chiếm 5 hàng (4 shape + 1 gap)
-            gotoxy(row, offsetX);
-            cout << (char)186;  // ║ viền trái
-
+            gotoxy(offRow + 2 + k * 5 + i, offCol);
+            cout << (char)186;
             for (int j = 0; j < 4; j++) {
-                char cell = blocks[type].shape[i][j];
-                if (cell != ' ')
-                    cout << (char)219 << (char)219;  // █ block đặc
-                else
-                    cout << "  ";
+                // Dùng getCell() thay vì truy cập shape trực tiếp
+                cout << (pieces[type]->getCell(i, j) != CELL_EMPTY
+                         ? string(2, (char)219)
+                         : "  ");
             }
-
-            // 1 cột trống padding phải + viền phải
-            cout << "  " << (char)186;  // ║ viền phải
+            cout << "  " << (char)186;
         }
-
-        // Hàng trống ngăn cách giữa các block (trừ block cuối)
         if (k < NEXT_COUNT - 1) {
-            int sepRow = offsetY + 2 + k * 5 + 4;
-            gotoxy(sepRow, offsetX);
+            gotoxy(offRow + 2 + k * 5 + 4, offCol);
             cout << (char)186;
             for (int j = 0; j < 10; j++) cout << "  ";
             cout << (char)186;
         }
     }
 
-    // Vẽ đường viền dưới
-    int bottomRow = offsetY + 2 + NEXT_COUNT * 5 - 1;
-    gotoxy(bottomRow, offsetX);
-    cout << (char)200;  // ╚
+    int bottomRow = offRow + 2 + NEXT_COUNT * 5 - 1;
+    gotoxy(bottomRow, offCol);
+    cout << (char)200;
     for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
-    cout << (char)188;  // ╝
+    cout << (char)188;
 }
 
-//Khung hiển thị điểm
+static void renderScoreBox(int row, int col, const char* label, int value) {
+    gotoxy(row, col);
+    cout << label;
+    gotoxy(row + 1, col);
+    cout << (char)201;
+    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
+    cout << (char)187;
+    gotoxy(row + 2, col);
+    cout << (char)186;
+    string s = to_string(value);
+    cout << " " << s;
+    for (int i = 0; i < 20 - 1 - (int)s.size(); i++) cout << " ";
+    cout << (char)186;
+    gotoxy(row + 3, col);
+    cout << (char)200;
+    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
+    cout << (char)188;
+}
+
 void renderScore() {
-    const int offsetX = W * 2 + 2; 
-    const int offsetY = 1;
-    
-    // Tính toán vị trí khung SCORE nằm dưới khung NEXT
-    int scoreOffsetY = offsetY + 2 + NEXT_COUNT * 5 + 1; 
-
-    // Tiêu đề
-    gotoxy(scoreOffsetY, offsetX);
-    cout << "SCORE";
-
-    // Vẽ đường viền trên (Tự vẽ bằng cout để khỏi cần hàm phụ)
-    gotoxy(scoreOffsetY + 1, offsetX);
-    cout << (char)201;  // ╔
-    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
-    cout << (char)187;  // ╗
-
-    // Vẽ nội dung điểm
-    gotoxy(scoreOffsetY + 2, offsetX);
-    cout << (char)186;  // ║
-    
-    // Ghi con số điểm hiện tại (Giả định biến 'score' đã có trong data.h)
-    string scoreStr = to_string(score); 
-    cout << " " << scoreStr;
-    
-    // Bơm thêm khoảng trắng cho vừa khung
-    int padding = 20 - 1 - scoreStr.length();
-    for(int i = 0; i < padding; i++) cout << " ";
-    cout << (char)186;  // ║
-
-    // Vẽ đường viền dưới (Tự vẽ bằng cout)
-    gotoxy(scoreOffsetY + 3, offsetX);
-    cout << (char)200;  // ╚
-    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
-    cout << (char)188;  // ╝
+    renderScoreBox(1 + 2 + NEXT_COUNT * 5 + 1, W * 2 + 2, "SCORE", score);
 }
+
 void renderHighScore() {
-    const int offsetX = W * 2 + 2; 
-    const int offsetY = 1;
-    
-    // Tính toán vị trí khung SCORE
-    int scoreOffsetY = offsetY + 2 + NEXT_COUNT * 5 + 1; 
-    
-    // Đặt khung HIGH SCORE nằm dưới khung SCORE một khoảng nhỏ
-    int highScoreOffsetY = scoreOffsetY + 5; 
-
-    // Tiêu đề
-    gotoxy(highScoreOffsetY, offsetX);
-    cout << "HIGH SCORE";
-
-    // Vẽ đường viền trên 
-    gotoxy(highScoreOffsetY + 1, offsetX);
-    cout << (char)201;  // ╔
-    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
-    cout << (char)187;  // ╗
-
-    // Vẽ nội dung điểm cao nhất
-    gotoxy(highScoreOffsetY + 2, offsetX);
-    cout << (char)186;  // ║
-    
-    // Ghi con số điểm cao nhất (Giả định biến 'highScore' đã có trong data.h)
-    string highScoreStr = to_string(highScore); 
-    cout << " " << highScoreStr;
-    
-    // Bơm thêm khoảng trắng cho vừa khung
-    int padding = 20 - 1 - highScoreStr.length();
-    for(int i = 0; i < padding; i++) cout << " ";
-    cout << (char)186;  // ║
-
-    // Vẽ đường viền dưới
-    gotoxy(highScoreOffsetY + 3, offsetX);
-    cout << (char)200;  // ╚
-    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
-    cout << (char)188;  // ╝
+    renderScoreBox(1 + 2 + NEXT_COUNT * 5 + 6, W * 2 + 2, "HIGH SCORE", highScore);
 }
 
-// VẼ BOARD + BLOCK + SCORE + HIGH SCORE
 void render() {
-    // Ẩn con trỏ (chỉ cần gọi 1 lần khi khởi tạo)
     CONSOLE_CURSOR_INFO ci = {1, FALSE};
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ci);
-    gotoxy(0,0);
-    for (int i = 0 ; i < H ; i++, cout<<endl)
-        for (int j = 0 ; j < W ; j++)
-            cout<<board[i][j]<<board[i][j];
-    
+    gotoxy(0, 0);
+    for (int i = 0; i < H; i++, cout << '\n')
+        for (int j = 0; j < W; j++)
+            cout << board[i][j] << board[i][j];
     renderNextQueue();
     renderScore();
     renderHighScore();
