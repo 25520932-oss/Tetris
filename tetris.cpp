@@ -5,53 +5,43 @@
 #include "render.h"
 #include "utils.h"
 
-int highScore = 0;
-
-bool GameOver(){
-    for (int i = 0 ; i < 4 ; i++)
-        for (int j = 0 ; j < 4 ; j++)
-            if (blocks[currentBlock].shape[i][j] != ' ')
-                if(board[y+i][x+j]!=' ') return true;
-    return false;
-}
-
 int main() {
 
     // KHỞI TẠO
-    initGame();     // seed random
-    initBoard();    // tạo board + tường
-    initBlocks();   // tạo shape các khối
+    initGame();       // seed random (utils.cpp)
+    initBoard();      // tạo board + tường (data.cpp)
+    initPieces();     // BUG FIX: đổi initBlocks() → initPieces() (tên đúng trong data.cpp)
 
-    spawnBlock();   // block đầu tiên
-    block2Board();  // vẽ block đầu tiên lên board
+    spawnBlock();     // block đầu tiên
+    block2Board();    // vẽ block đầu tiên lên board
 
     // GAME LOOP
     while (true) {
 
         render();
+
         // INPUT
         processInput();
 
         // LOGIC RƠI
         if (!moveBlock(0, 1)) {
-            // FIX: moveBlock đã gọi block2Board() bên trong,
-            // lockBlock() chỉ cần gọi khi block KHÔNG di chuyển được (chạm đáy)
-            lockBlock();
-
-
+            // block không di chuyển được → khóa tại chỗ (block2Board đã gọi trong moveBlock)
             removeLine();
 
             spawnBlock();
-            if(GameOver()) break;
-            block2Board(); // FIX: vẽ block mới lên board ngay sau khi spawn
 
+            // Kiểm tra game over TRƯỚC khi vẽ block mới lên board
+            // Nếu check sau block2Board() thì luôn thấy ô bị chiếm → false positive
+            if (isGameOver()) break;
+            block2Board(); // vẽ block mới lên board
         }
 
         // DELAY — tốc độ tăng dần theo level (tối thiểu 80ms)
         int speed = max(80, 300 - level * 20);
         delay(speed);
     }
-    gotoxy(23,0);
-    cout<<"GAME OVER!";
+
+    gotoxy(23, 0);
+    cout << "GAME OVER!" << endl;
     return 0;
 }

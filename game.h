@@ -12,5 +12,6 @@ bool canMove(int dx, int dy);
 
 // XÓA DÒNG - tăng tốc
 int removeLine();
-
+//endgame
+bool isGameOver();
 #endif
