@@ -9,7 +9,6 @@
 #endif
 
 // Sử dụng mã Escape cho ký tự Full Block (U+2588)
-// Cách này an toàn tuyệt đối, không lo lỗi font khi lưu file .cpp
 #define BLOCK_CHAR "\xe2\x96\x88\xe2\x96\x88" 
 #define WALL_CHAR  "\xe2\x96\x92\xe2\x96\x92"
 #define BG_CHAR    "\xc2\xb7 " 
