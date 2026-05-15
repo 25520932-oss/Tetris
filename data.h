@@ -8,6 +8,10 @@ using namespace std;
 const int H = 22;
 const int W = 12;
 
+// KÝ TỰ ĐẠI DIỆN
+const char CELL_EMPTY = ' ';
+const char CELL_WALL  = (char)178; // ▓
+const char CELL_BLOCK = (char)176; // ░
 
 // LOẠI KHỐI TETRIS
 enum BlockType {
@@ -15,34 +19,30 @@ enum BlockType {
     NONE = -1
 };
 
-// STRUCT KHỐI
-struct Block {
-    char shape[4][4];
-};
+// === FORWARD DECLARE để data.h không phụ thuộc vào piece_class.h ===
+class Piece;
 
 // BOARD GAME
 extern char board[H][W];
 
-// BLOCK DATA
-extern Block blocks[BLOCK_COUNT];
+// Mảng pointer — truy cập qua virtual dispatch (đa hình)
+extern Piece* pieces[BLOCK_COUNT];
 
 // BIẾN TRẠNG THÁI
-extern int x, y;              // vị trí block hiện tại (cột, hàng)
-extern int ghostY;            // hàng ghost block
-extern int rotation;          // góc xoay 0-3
+extern int x, y;
+extern int rotation;
 extern BlockType currentBlock;
+
 const int NEXT_COUNT = 4;
-extern BlockType nextQueue[NEXT_COUNT];   // hàng đợi 4 block tiếp theo
-extern BlockType heldBlock;
-extern bool hasHeld;          // đã hold trong lượt này chưa
+extern BlockType nextQueue[NEXT_COUNT];
 
-// ĐIỂM SỐ & TỐC ĐỘ
-extern int score;   // tổng số dòng đã xóa
-extern int level;   // cấp độ hiện tại (tăng mỗi 10 dòng)
-extern int highScore; // điểm cao nhất
+// ĐIỂM SỐ & CẤP ĐỘ
+extern int score;
+extern int level;
+extern int highScore;
 
-// kHỞI TẠO BẢNG
-void initBlocks();
+// KHỞI TẠO
+void initPieces(); // thay initBlocks()
 void initBoard();
 
 #endif
