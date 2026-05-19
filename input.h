@@ -1,7 +1,8 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-// XỬ LÝ INPUT NGƯỜI CHƠI
-void processInput();
+#include <SFML/Window/Event.hpp>
+
+void processInput(const sf::Event& event);
 
 #endif
