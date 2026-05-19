@@ -6,42 +6,51 @@
 #include "utils.h"
 
 int main() {
+    //KHỞI TẠO 
+    initGame();
+    initBoard();
+    initPieces();
+    initRender();
 
-    // KHỞI TẠO
-    initGame();       // seed random (utils.cpp)
-    initBoard();      // tạo board + tường (data.cpp)
-    initPieces();     // BUG FIX: đổi initBlocks() → initPieces() (tên đúng trong data.cpp)
+    spawnBlock();
+    block2Board();
 
-    spawnBlock();     // block đầu tiên
-    block2Board();    // vẽ block đầu tiên lên board
+    //Clock để tính thời gian rơi
+    sf::Clock fallClock;
+    bool gameOver = false;
 
-    // GAME LOOP
-    while (true) {
+    while (window.isOpen() && !gameOver) {
+─
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
 
-        render();
+            processInput(event);
+        }
+  
+        int speed = std::max(80, 300 - level * 20);
+        if (fallClock.getElapsedTime().asMilliseconds() >= speed) {
+            fallClock.restart();
 
-        // INPUT
-        processInput();
+            if (!moveBlock(0, 1)) {
+                removeLine();
+                spawnBlock();
 
-        // LOGIC RƠI
-        if (!moveBlock(0, 1)) {
-            // block không di chuyển được → khóa tại chỗ (block2Board đã gọi trong moveBlock)
-            removeLine();
-
-            spawnBlock();
-
-            // Kiểm tra game over TRƯỚC khi vẽ block mới lên board
-            // Nếu check sau block2Board() thì luôn thấy ô bị chiếm → false positive
-            if (isGameOver()) break;
-            block2Board(); // vẽ block mới lên board
+                if (isGameOver()) {
+                    gameOver = true;
+                } else {
+                    block2Board();
+                }
+            }
         }
 
-        // DELAY — tốc độ tăng dần theo level (tối thiểu 80ms)
-        int speed = max(80, 300 - level * 20);
-        delay(speed);
+        render();
     }
 
-    gotoxy(23, 0);
-    cout << "GAME OVER!" << endl;
+    //game over tạm
+    if (window.isOpen())
+        window.close();
+
     return 0;
 }
