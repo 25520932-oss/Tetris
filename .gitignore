@@ -3,4 +3,4 @@
 *.out
 *.gch
 build/
-.vscode/
+.vscode/.DS_Store
