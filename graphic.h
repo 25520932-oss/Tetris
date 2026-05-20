@@ -1,30 +1,29 @@
 #ifndef GRAPHIC_H
 #define GRAPHIC_H
 
-#include "data.h"
+#include <iostream>
+#include <string>
 #include <SFML/Graphics.hpp>
 
-// Kích thước ô (pixel)
-const int CELL = 30;
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
-//Bảng màu theo BlockType
-extern const sf::Color PIECE_COLORS[BLOCK_COUNT];
+const int BOARD_ROWS = 20; // Số hàng
+const int BOARD_COLS = 15; // Số cột (bao gồm cả 2 cột tường xám biên)
+const int CELL_SIZE = 32;  // Kích thước 1 ô vuông (pixel)
 
-//Màu giao diện chung
-extern const sf::Color COL_BG;
-extern const sf::Color COL_BOARD;
-extern const sf::Color COL_GRID;
-extern const sf::Color COL_WALL;
-extern const sf::Color COL_LOCKED;
-extern const sf::Color COL_PANEL;
-extern const sf::Color COL_BORDER;
-extern const sf::Color COL_LABEL;
-extern const sf::Color COL_VALUE;
+const int DASHBOARD_WIDTH_COLS = 6; // Chiều rộng vùng mở rộng trơn mỗi bên (tính bằng số ô)
 
-//Hàm vẽ ô đơn và shape khối
-void drawCell(sf::RenderWindow& win, float px, float py, sf::Color col);
+const std::string RESET = "\033[0m";
+const std::string FLASH = "\033[97m\033[5m";
+const std::string GHOST = "\033[90m";
 
-void drawPieceShape(sf::RenderWindow& win, sf::Font& font,
-    float px, float py, BlockType type);
+void initGraphics();
+bool isGraphicsOpen();
+void handleGraphicsEvents();
+sf::RenderWindow* getRenderWindow();
+void drawBoard(char board[BOARD_ROWS][BOARD_COLS], char pieceType, int pieceMatrix[4][4], float visualX, float visualY);
+void playClearAnimation(char board[BOARD_ROWS][BOARD_COLS], int row);
 
 #endif
