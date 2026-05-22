@@ -1,5 +1,6 @@
 #include "audio.h"
 
+Audio gameAudio;
 Audio::Audio() {}
 Audio::~Audio() {}
 

@@ -52,5 +52,5 @@ public:
     void setMusicVolume(int volume); 
     void setSFXVolume(int volume);   
 };
-
+extern Audio gameAudio;
 #endif
