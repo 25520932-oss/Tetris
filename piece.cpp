@@ -1,8 +1,8 @@
 #include "piece.h"
 #include "game.h"
 #include "piece_class.h"
+#include "audio.h"  
 #include <cstdlib>
-
 
 void spawnBlock() {
     currentBlock = nextQueue[0];
@@ -16,7 +16,6 @@ void spawnBlock() {
     y = 0;
     rotation = 0;
 
-    // Mỗi lượt spawn mới → cho phép hold lại
     holdUsed = false;
 }
 
@@ -43,7 +42,6 @@ void rotateBlock() {
     pieces[currentBlock]->rotate();
 
     if (!canMove(0, 0)) {
-        // Hoàn tác nếu xoay gây va chạm
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
                 pieces[currentBlock]->shape[i][j] = temp[i][j];
@@ -52,21 +50,18 @@ void rotateBlock() {
     block2Board();
 }
 
-
 void doHoldBlock() {
-    if (holdUsed) return;       // đã hold lượt này → bỏ qua
+    if (holdUsed) return;
     holdUsed = true;
 
     boardDelBlock();
 
     if (holdBlock == NONE) {
-        // Chưa có hold → lưu lại, spawn block kế tiếp
         holdBlock = currentBlock;
-        spawnBlock();           // spawnBlock sẽ reset holdUsed = false,
+        spawnBlock();
         holdUsed = true;
     }
     else {
-        // Hoán đổi hold ↔ current
         BlockType tmp = holdBlock;
         holdBlock = currentBlock;
         currentBlock = tmp;
@@ -78,4 +73,8 @@ void doHoldBlock() {
     }
 
     block2Board();
+}
+
+void lockBlock() {
+    gameAudio.playSFX(SoundEffect::JOINT);
 }
