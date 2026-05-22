@@ -11,7 +11,7 @@
 
 class Piece {
 public:
-    char shape[4][4];
+    char shape[4][4] = {};
 
     // Truy cập ô tại hàng i, cột j
     virtual char getCell(int i, int j) const = 0;

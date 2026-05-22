@@ -6,7 +6,7 @@
 sf::RenderWindow window;
 sf::Font         font;
 
-//ve bang hinh chu nhat
+
 static void drawRect(float x, float y, float w, float h,
     sf::Color fill,
     sf::Color outline = sf::Color::Transparent,
@@ -21,7 +21,6 @@ static void drawRect(float x, float y, float w, float h,
     window.draw(r);
 }
 
-//drawText
 static float drawText(const std::string& str, float x, float y,
     unsigned size, sf::Color color, bool bold = false) {
     sf::Text t;
@@ -35,7 +34,6 @@ static float drawText(const std::string& str, float x, float y,
     return t.getLocalBounds().width;
 }
 
-//drawPanel
 static void drawPanel(float px, float py, float pw, float ph,
     const std::string& title = "") {
     drawRect(px, py, pw, ph, COL_PANEL, COL_BORDER, 1.5f);
@@ -49,30 +47,47 @@ void initRender() {
     window.create(sf::VideoMode(WIN_W, WIN_H), "Tetris",
         sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(60);
-
+    //chay font chu tren da nen tang
     if (!font.loadFromFile("arial.ttf"))
         if (!font.loadFromFile("C:/Windows/Fonts/arial.ttf"))
             if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
                 font.loadFromFile("/System/Library/Fonts/Helvetica.ttc");
 }
 
+// renderBoard 
+
 void renderBoard() {
     const float OX = (float)SIDE_W;
     const float OY = 0.f;
 
-    // Nền board (toàn bộ W*H)
+    {
+        float w = (float)WIN_W;
+        float h = (float)WIN_H;
+        sf::Color topCol(10, 20, 45);
+        sf::Color botCol(45, 15, 65);
+        sf::VertexArray bg(sf::Quads, 4);
+        bg[0] = { sf::Vector2f(0.f, 0.f), topCol };
+        bg[1] = { sf::Vector2f(w,   0.f), topCol };
+        bg[2] = { sf::Vector2f(w,   h), botCol };
+        bg[3] = { sf::Vector2f(0.f, h), botCol };
+        window.draw(bg);
+    }
+
+    // Nền lòng board
     drawRect(OX, OY, (float)BOARD_PX, (float)WIN_H, COL_BOARD);
 
+    // Lưới
     for (int i = 0; i <= H; i++)
         drawRect(OX, OY + i * CELL, (float)BOARD_PX, 1.f, COL_GRID);
     for (int j = 0; j <= W; j++)
         drawRect(OX + j * CELL, OY, 1.f, (float)WIN_H, COL_GRID);
 
+    // Các ô đã đặt + tường
     for (int i = 0; i < H; i++) {
         for (int j = 0; j < W; j++) {
             char cell = board[i][j];
-            float px = OX + j * CELL;   // [FIX] j thay vì (j-1)
-            float py = OY + i * CELL;   // [FIX] i thay vì (i-1)
+            float px = OX + j * CELL;
+            float py = OY + i * CELL;
 
             if (cell == CELL_BLOCK) {
                 drawCell(window, px, py, COL_LOCKED);
@@ -82,8 +97,7 @@ void renderBoard() {
             }
         }
     }
-
-    // Vẽ piece hiện tại với màu đúng
+    // Piece hiện tại với màu đúng
     if (currentBlock != NONE) {
         sf::Color col = PIECE_COLORS[currentBlock];
         for (int i = 0; i < 4; i++)
@@ -91,11 +105,8 @@ void renderBoard() {
                 if (pieces[currentBlock]->getCell(i, j) != CELL_EMPTY) {
                     int bi = y + i;
                     int bj = x + j;
-                    if (bi >= 0 && bi < H && bj >= 0 && bj < W)  // [FIX] bound đủ H,W
-                        drawCell(window,
-                            OX + bj * CELL,   // [FIX] bj thay vì (bj-1)
-                            OY + bi * CELL,    // [FIX] bi thay vì (bi-1)
-                            col);
+                    if (bi >= 0 && bi < H && bj >= 0 && bj < W)
+                        drawCell(window, OX + bj * CELL, OY + bi * CELL, col);
                 }
     }
 
@@ -104,6 +115,7 @@ void renderBoard() {
     drawRect(OX + BOARD_PX, OY, 2.f, (float)WIN_H, COL_BORDER);
 }
 
+//renderHoldBox 
 void renderHoldBox() {
     const float PANEL_W = SIDE_W - 20.f;
     const float PANEL_H = 4.f * CELL + 16.f;
@@ -112,11 +124,19 @@ void renderHoldBox() {
 
     drawPanel(PX, PY, PANEL_W, PANEL_H, "HOLD");
 
+    if (holdUsed && holdBlock != NONE) {
+        sf::RectangleShape dim({ PANEL_W, PANEL_H });
+        dim.setPosition(PX, PY);
+        dim.setFillColor(sf::Color(0, 0, 0, 100));
+        window.draw(dim);
+    }
+
     drawPieceShape(window, font,
         PX + (PANEL_W - 4.f * CELL) / 2.f, PY + 8.f,
         holdBlock);
 }
 
+//renderNextQueue 
 void renderNextQueue() {
     const float PANEL_W = SIDE_W - 20.f;
     const float SLOT_H = 4.f * CELL + 12.f;
@@ -129,7 +149,6 @@ void renderNextQueue() {
     for (int k = 0; k < NEXT_COUNT; k++) {
         float slotY = PY_START + 8.f + k * SLOT_H;
         float shapeX = PX + (PANEL_W - 4.f * CELL) / 2.f;
-        // [CHANGED] drawPieceShape từ graphic.cpp
         drawPieceShape(window, font, shapeX, slotY, nextQueue[k]);
 
         if (k < NEXT_COUNT - 1)
@@ -138,7 +157,7 @@ void renderNextQueue() {
     }
 }
 
-//thong so
+//renderStats
 void renderStats() {
     const float PANEL_W = SIDE_W - 20.f;
     const float PX = 10.f;
@@ -146,10 +165,10 @@ void renderStats() {
 
     struct Stat { const char* label; int value; };
     Stat stats[] = {
-        { "SCORE",      score       },
-        { "HIGH SCORE", highScore   },
+        { "SCORE",      score        },
+        { "HIGH SCORE", highScore    },
         { "LINES",      linesCleared },
-        { "LEVEL",      level       },
+        { "LEVEL",      level        },
     };
 
     for (auto& s : stats) {
@@ -171,10 +190,11 @@ void renderStats() {
     }
 }
 
+// render
 void render() {
-    window.clear(COL_BG);
+    window.clear(sf::Color(10, 20, 45));
 
-    renderBoard();
+    renderBoard(); 
     renderHoldBox();
     renderNextQueue();
     renderStats();

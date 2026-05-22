@@ -15,4 +15,7 @@ void rotateBlock();
 // Hold block hiện tại (chỉ 1 lần mỗi lượt)
 void doHoldBlock();
 
+//Để tạo âm thanh cho xóa khối
+void lockBlock();
+
 #endif

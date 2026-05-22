@@ -1,29 +1,55 @@
 #ifndef GRAPHIC_H
 #define GRAPHIC_H
 
-#include <iostream>
-#include <string>
+#include "data.h"
 #include <SFML/Graphics.hpp>
+#include <thread>
+#include <chrono>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
+//Kích thước ô (pixel) 
+const int CELL = 30;
 
-const int BOARD_ROWS = 20; // Số hàng
-const int BOARD_COLS = 15; // Số cột (bao gồm cả 2 cột tường xám biên)
-const int CELL_SIZE = 32;  // Kích thước 1 ô vuông (pixel)
+//Bảng màu theo BlockType
+extern const sf::Color PIECE_COLORS[BLOCK_COUNT];
 
-const int DASHBOARD_WIDTH_COLS = 6; // Chiều rộng vùng mở rộng trơn mỗi bên (tính bằng số ô)
+//Màu giao diện chung
+extern const sf::Color COL_BG;
+extern const sf::Color COL_BOARD;
+extern const sf::Color COL_GRID;
+extern const sf::Color COL_WALL;
+extern const sf::Color COL_LOCKED;
+extern const sf::Color COL_PANEL;
+extern const sf::Color COL_BORDER;
+extern const sf::Color COL_LABEL;
+extern const sf::Color COL_VALUE;
 
-const std::string RESET = "\033[0m";
-const std::string FLASH = "\033[97m\033[5m";
-const std::string GHOST = "\033[90m";
+// [NEW] Ghost piece (bóng mờ dự đoán) và flash khi xóa hàng
+extern const sf::Color COL_GHOST;
+extern const sf::Color COL_FLASH;
 
-void initGraphics();
-bool isGraphicsOpen();
-void handleGraphicsEvents();
-sf::RenderWindow* getRenderWindow();
-void drawBoard(char board[BOARD_ROWS][BOARD_COLS], char pieceType, int pieceMatrix[4][4], float visualX, float visualY);
-void playClearAnimation(char board[BOARD_ROWS][BOARD_COLS], int row);
+//       đổi sang BlockType
+sf::Color getPieceColor(BlockType type, sf::Uint8 alpha = 255);
+
+//drawCell — ô đơn với bóng + highlight
+void drawCell(sf::RenderWindow& win, float px, float py, sf::Color col);
+
+//  drawGhostCell — ô ghost: trong suốt, chỉ viền màu mờ 
+void drawGhostCell(sf::RenderWindow& win, float px, float py, sf::Color col);
+
+// drawPieceShape — shape 4×4, căn giữa trong vùng px,py
+void drawPieceShape(sf::RenderWindow& win, sf::Font& font,
+    float px, float py, BlockType type);
+
+//drawGhostPiece — bóng mờ dự đoán vị trí rơi
+void drawGhostPiece(sf::RenderWindow& win,
+    float boardOriginX, float boardOriginY);
+
+// drawOmbreBackground — nền gradient tím sẫm 
+void drawOmbreBackground(sf::RenderWindow& win);
+
+//playClearAnimation — flash trắng hàng vừa xóa
+void playClearAnimation(sf::RenderWindow& win, sf::Font& fnt,
+    const int* rows, int rowCount,
+    float boardOriginX, float boardOriginY);
 
 #endif
