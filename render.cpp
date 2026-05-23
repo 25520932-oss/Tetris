@@ -1,95 +1,203 @@
 #include "render.h"
-#include "data.h"
+#include "graphic.h"
 #include "piece_class.h"
-#include <iostream>
 #include <string>
 
-#define byte win_byte_override
-#include <windows.h>
-#undef byte
+extern  sf::RenderWindow window; //dung chung voi bien o file tetris de tranh loi tao 2 man hinh game
+sf::Font         font;
 
-using namespace std;
 
-void gotoxy(int row, int col) {
-    COORD coord = { (SHORT)col, (SHORT)row };
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+static void drawRect(float x, float y, float w, float h,
+    sf::Color fill,
+    sf::Color outline = sf::Color::Transparent,
+    float thick = 0.f) {
+    sf::RectangleShape r({ w, h });
+    r.setPosition(x, y);
+    r.setFillColor(fill);
+    if (thick > 0.f) {
+        r.setOutlineThickness(thick);
+        r.setOutlineColor(outline);
+    }
+    window.draw(r);
 }
 
-void renderNextQueue() {
-    const int offCol = W * 2 + 2;
-    const int offRow = 1;
+static float drawText(const std::string& str, float x, float y,
+    unsigned size, sf::Color color, bool bold = false) {
+    sf::Text t;
+    t.setFont(font);
+    t.setString(str);
+    t.setCharacterSize(size);
+    t.setFillColor(color);
+    if (bold) t.setStyle(sf::Text::Bold);
+    t.setPosition(x, y);
+    window.draw(t);
+    return t.getLocalBounds().width;
+}
 
-    gotoxy(offRow, offCol);
-    cout << "NEXT";
+static void drawPanel(float px, float py, float pw, float ph,
+    const std::string& title = "") {
+    drawRect(px, py, pw, ph, COL_PANEL, COL_BORDER, 1.5f);
+    if (!title.empty()) {
+        float tw = drawText(title, 0, 0, 13, COL_LABEL);
+        drawText(title, px + (pw - tw) / 2.f, py - 18.f, 13, COL_LABEL);
+    }
+}
 
-    gotoxy(offRow + 1, offCol);
-    cout << (char)201;
-    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
-    cout << (char)187;
+void initRender() {
+    //window.create(sf::VideoMode(WIN_W, WIN_H), "Tetris",
+        //sf::Style::Titlebar | sf::Style::Close);
+    //window.setFramerateLimit(60);
+    //chay font chu tren da nen tang
+    if (!font.loadFromFile("arial.ttf"))
+        if (!font.loadFromFile("C:/Windows/Fonts/arial.ttf"))
+            if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
+                font.loadFromFile("/System/Library/Fonts/Helvetica.ttc");
+}
 
-    for (int k = 0; k < NEXT_COUNT; k++) {
-        BlockType type = nextQueue[k];
-        for (int i = 0; i < 4; i++) {
-            gotoxy(offRow + 2 + k * 5 + i, offCol);
-            cout << (char)186;
-            for (int j = 0; j < 4; j++) {
-                // Dùng getCell() thay vì truy cập shape trực tiếp
-                cout << (pieces[type]->getCell(i, j) != CELL_EMPTY
-                         ? string(2, (char)219)
-                         : "  ");
-            }
-            cout << "  " << (char)186;
-        }
-        if (k < NEXT_COUNT - 1) {
-            gotoxy(offRow + 2 + k * 5 + 4, offCol);
-            cout << (char)186;
-            for (int j = 0; j < 10; j++) cout << "  ";
-            cout << (char)186;
-        }
+// renderBoard 
+
+void renderBoard() {
+    const float OX = (float)SIDE_W;
+    const float OY = 0.f;
+
+    {
+        float w = (float)WIN_W;
+        float h = (float)WIN_H;
+        sf::Color topCol(10, 20, 45);
+        sf::Color botCol(45, 15, 65);
+        sf::VertexArray bg(sf::Quads, 4);
+        bg[0] = { sf::Vector2f(0.f, 0.f), topCol };
+        bg[1] = { sf::Vector2f(w,   0.f), topCol };
+        bg[2] = { sf::Vector2f(w,   h), botCol };
+        bg[3] = { sf::Vector2f(0.f, h), botCol };
+        window.draw(bg);
     }
 
-    int bottomRow = offRow + 2 + NEXT_COUNT * 5 - 1;
-    gotoxy(bottomRow, offCol);
-    cout << (char)200;
-    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
-    cout << (char)188;
+    // Nền lòng board
+    drawRect(OX, OY, (float)BOARD_PX, (float)WIN_H, COL_BOARD);
+
+    // Lưới
+    for (int i = 0; i <= H; i++)
+        drawRect(OX, OY + i * CELL, (float)BOARD_PX, 1.f, COL_GRID);
+    for (int j = 0; j <= W; j++)
+        drawRect(OX + j * CELL, OY, 1.f, (float)WIN_H, COL_GRID);
+
+    // Các ô đã đặt + tường
+    for (int i = 0; i < H; i++) {
+        for (int j = 0; j < W; j++) {
+            char cell = board[i][j];
+            float px = OX + j * CELL;
+            float py = OY + i * CELL;
+
+            if (cell == CELL_BLOCK) {
+                drawCell(window, px, py, COL_LOCKED);
+            }
+            else if (cell == CELL_WALL) {
+                drawRect(px, py, CELL, CELL, COL_WALL);
+            }
+        }
+    }
+    // Piece hiện tại với màu đúng
+    if (currentBlock != NONE) {
+        sf::Color col = PIECE_COLORS[currentBlock];
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                if (pieces[currentBlock]->getCell(i, j) != CELL_EMPTY) {
+                    int bi = y + i;
+                    int bj = x + j;
+                    if (bi >= 0 && bi < H && bj >= 0 && bj < W)
+                        drawCell(window, OX + bj * CELL, OY + bi * CELL, col);
+                }
+    }
+
+    // Viền trái/phải board
+    drawRect(OX - 2.f, OY, 2.f, (float)WIN_H, COL_BORDER);
+    drawRect(OX + BOARD_PX, OY, 2.f, (float)WIN_H, COL_BORDER);
 }
 
-static void renderScoreBox(int row, int col, const char* label, int value) {
-    gotoxy(row, col);
-    cout << label;
-    gotoxy(row + 1, col);
-    cout << (char)201;
-    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
-    cout << (char)187;
-    gotoxy(row + 2, col);
-    cout << (char)186;
-    string s = to_string(value);
-    cout << " " << s;
-    for (int i = 0; i < 20 - 1 - (int)s.size(); i++) cout << " ";
-    cout << (char)186;
-    gotoxy(row + 3, col);
-    cout << (char)200;
-    for (int j = 0; j < 10; j++) cout << (char)205 << (char)205;
-    cout << (char)188;
+//renderHoldBox 
+void renderHoldBox() {
+    const float PANEL_W = SIDE_W - 20.f;
+    const float PANEL_H = 4.f * CELL + 16.f;
+    const float PX = 10.f;
+    const float PY = 30.f;
+
+    drawPanel(PX, PY, PANEL_W, PANEL_H, "HOLD");
+
+    if (holdUsed && holdBlock != NONE) {
+        sf::RectangleShape dim({ PANEL_W, PANEL_H });
+        dim.setPosition(PX, PY);
+        dim.setFillColor(sf::Color(0, 0, 0, 100));
+        window.draw(dim);
+    }
+
+    drawPieceShape(window, font,
+        PX + (PANEL_W - 4.f * CELL) / 2.f, PY + 8.f,
+        holdBlock);
 }
 
-void renderScore() {
-    renderScoreBox(1 + 2 + NEXT_COUNT * 5 + 1, W * 2 + 2, "SCORE", score);
+//renderNextQueue 
+void renderNextQueue() {
+    const float PANEL_W = SIDE_W - 20.f;
+    const float SLOT_H = 4.f * CELL + 12.f;
+    const float PX = (float)(SIDE_W + BOARD_PX) + 10.f;
+    const float PY_START = 30.f;
+
+    float totalH = NEXT_COUNT * SLOT_H + 8.f;
+    drawPanel(PX, PY_START, PANEL_W, totalH, "NEXT");
+
+    for (int k = 0; k < NEXT_COUNT; k++) {
+        float slotY = PY_START + 8.f + k * SLOT_H;
+        float shapeX = PX + (PANEL_W - 4.f * CELL) / 2.f;
+        drawPieceShape(window, font, shapeX, slotY, nextQueue[k]);
+
+        if (k < NEXT_COUNT - 1)
+            drawRect(PX + 8.f, slotY + SLOT_H - 1.f,
+                PANEL_W - 16.f, 1.f, COL_GRID);
+    }
 }
 
-void renderHighScore() {
-    renderScoreBox(1 + 2 + NEXT_COUNT * 5 + 6, W * 2 + 2, "HIGH SCORE", highScore);
+//renderStats
+void renderStats() {
+    const float PANEL_W = SIDE_W - 20.f;
+    const float PX = 10.f;
+    float       PY = 30.f + 4.f * CELL + 16.f + 20.f;
+
+    struct Stat { const char* label; int value; };
+    Stat stats[] = {
+        { "SCORE",      score        },
+        { "HIGH SCORE", highScore    },
+        { "LINES",      linesCleared },
+        { "LEVEL",      level        },
+    };
+
+    for (auto& s : stats) {
+        const float BOX_H = 44.f;
+        drawPanel(PX, PY, PANEL_W, BOX_H, s.label);
+
+        std::string val = std::to_string(s.value);
+        sf::Text t;
+        t.setFont(font);
+        t.setString(val);
+        t.setCharacterSize(20);
+        t.setStyle(sf::Text::Bold);
+        t.setFillColor(COL_VALUE);
+        float tw = t.getLocalBounds().width;
+        t.setPosition(PX + (PANEL_W - tw) / 2.f, PY + 12.f);
+        window.draw(t);
+
+        PY += BOX_H + 22.f;
+    }
 }
 
+// render
 void render() {
-    CONSOLE_CURSOR_INFO ci = {1, FALSE};
-    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ci);
-    gotoxy(0, 0);
-    for (int i = 0; i < H; i++, cout << '\n')
-        for (int j = 0; j < W; j++)
-            cout << board[i][j] << board[i][j];
+    window.clear(sf::Color(10, 20, 45));
+
+    renderBoard(); 
+    renderHoldBox();
     renderNextQueue();
-    renderScore();
-    renderHighScore();
+    renderStats();
+
+    window.display();
 }

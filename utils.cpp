@@ -1,20 +1,18 @@
 #include "utils.h"
-#include <iostream>
-
-#define byte win_byte_override
-#include <windows.h>
-#undef byte
-
-using namespace std;
+#include <SFML/System/Clock.hpp>
 #include <ctime>
 #include <cstdlib>
+#include "data.h"
 
-// DELAY
 void delay(int ms) {
-    Sleep(ms);
+    sf::Clock clock;
+    while (clock.getElapsedTime().asMilliseconds() < ms) { /* spin */ }
 }
 
-// INIT GAME
-//void initGame() {
-    //srand(time(0));
-//}
+void initGame() {
+    //reset lai khi retry game
+    score = 0;
+    level = 1;
+    linesCleared = 0;
+    srand((unsigned)time(0));
+}

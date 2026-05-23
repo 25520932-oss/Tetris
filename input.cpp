@@ -1,44 +1,48 @@
 #include "input.h"
 #include "piece.h"
-#include <conio.h>
+#include "audio.h"   // [NEW] SFX cho từng thao tác
 
-// XỬ LÝ INPUT
-// Convention: moveBlock(dx, dy) — dx: delta cột (trái/phải), dy: delta hàng (xuống)
-void processInput() {
-    if (!_kbhit()) return;
+void processInput(const sf::Event& event) {
+    if (event.type != sf::Event::KeyPressed) return;
 
-    char key = _getch();
+    switch (event.key.code) {
 
-    switch (key) {
-        // DI CHUYỂN NGANG
-        case 'a': // trái
-        case 'A':
-            moveBlock(-1, 0);  // FIX: dx=-1 (sang trái), dy=0
-            break;
+        // Di chuyển trái/phải
+    case sf::Keyboard::A: case sf::Keyboard::Left:
+        if (moveBlock(-1, 0))
+            gameAudio.playSFX(SoundEffect::MOVE);
+        break;
 
-        case 'd': // phải
-        case 'D':
-            moveBlock(1, 0);   // FIX: dx=+1 (sang phải), dy=0
-            break;
+    case sf::Keyboard::D: case sf::Keyboard::Right:
+        if (moveBlock(1, 0))
+            gameAudio.playSFX(SoundEffect::MOVE);
+        break;
 
-        case 's': // xuống nhanh
-        case 'S':
-            moveBlock(0, 1);   // FIX: dx=0, dy=+1 (xuống 1 hàng)
-            break;
+        // Soft drop
+    case sf::Keyboard::S: case sf::Keyboard::Down:
+        if (moveBlock(0, 1))
+            gameAudio.playSFX(SoundEffect::MOVE);
+        break;
 
-        // XOAY
-        case 'w':
-        case 'W':
-            rotateBlock();
-            break;
-        //HOLD
-        case 'c':
-        case 'C':
-            //holdBlock();
-            break;
-        // Đưa khối xuống đáy ngay
-        case ' ':
-            while (moveBlock(0, 1));  // FIX: dy=+1
-            break;
+        // Xoay
+    case sf::Keyboard::W: case sf::Keyboard::Up:
+        rotateBlock();
+        gameAudio.playSFX(SoundEffect::ROTATE); 
+        break;
+
+        // Hold
+    case sf::Keyboard::C:
+        doHoldBlock();
+        gameAudio.playSFX(SoundEffect::ROTATE);
+        break;
+
+        // Hard drop
+    case sf::Keyboard::Space:
+        while (moveBlock(0, 1));                    // rơi hết xuống đáy
+        gameAudio.playSFX(SoundEffect::HARD_DROP);
+        break;
+
+    default:
+        break;
     }
 }

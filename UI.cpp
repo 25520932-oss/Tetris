@@ -1,4 +1,5 @@
 #include "ui.h"
+#include "audio.h"
 
 UIManager::UIManager() {
     currentState = GameState::MainMenu;
@@ -9,14 +10,17 @@ UIManager::UIManager() {
     currentGameOverIdx = 0;
     bgmVolume = 50.0f;
     sfxVolume = 50.0f;
+    currentMusicVol = 5;
+    currentSFXVol = 5;
     selectedVolumeBar = 0;
     score = 0;
     isTransitioning = false;
     transitionAlpha = 0.0f;
 }
 
+extern Audio gameAudio;
+
 bool UIManager::init(const std::string& fontPath, sf::RenderWindow& window) {
-    // SFML 2.x dùng lại hàm loadFromFile quen thuộc
     if (!font.loadFromFile(fontPath)) {
         return false;
     }
@@ -44,7 +48,6 @@ bool UIManager::init(const std::string& fontPath, sf::RenderWindow& window) {
     gameOverButtons.push_back(createButton("QUIT", {winSize.x / 2, 400}, {220, 50}));
     gameOverButtons[0].isSelected = true;
 
-    // Tiêu đề chữ Game Over quay lại chuẩn .left .top .width .height
     gameOverTitle.setFont(font);
     gameOverTitle.setString("GAME OVER");
     gameOverTitle.setCharacterSize(50);
@@ -112,7 +115,6 @@ void UIManager::triggerTransition(GameState targetState) {
 void UIManager::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     if (isTransitioning) return;
 
-    // Quay lại cách kiểm tra phím event.type truyền thống của SFML 2.x
     if (event.type == sf::Event::KeyPressed) {
 
         if (currentState == GameState::MainMenu) {
@@ -147,12 +149,41 @@ void UIManager::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
             settingsButtons[0].isSelected = (selectedVolumeBar == 2);
 
             if (event.key.code == sf::Keyboard::Left) {
-                if (selectedVolumeBar == 0) bgmVolume = std::max(0.0f, bgmVolume - 5.0f);
-                if (selectedVolumeBar == 1) sfxVolume = std::max(0.0f, sfxVolume - 5.0f);
+
+                if (selectedVolumeBar == 0)
+                {
+                    currentMusicVol--;
+                    if (currentMusicVol < 0) currentMusicVol = 0;
+                    gameAudio.setMusicVolume(currentMusicVol);
+                    bgmVolume = std::max(0.0f, bgmVolume - 5.0f);
+                }
+
+                 
+                if (selectedVolumeBar == 1)
+                {
+                    sfxVolume = std::max(0.0f, sfxVolume - 5.0f);
+                    currentSFXVol--;
+                    if (currentSFXVol < 0) currentSFXVol = 0;
+                    gameAudio.setSFXVolume(currentSFXVol);
+                    gameAudio.playSFX(SoundEffect::MOVE);
+                }
             }
             if (event.key.code == sf::Keyboard::Right) {
-                if (selectedVolumeBar == 0) bgmVolume = std::min(100.0f, bgmVolume + 5.0f);
-                if (selectedVolumeBar == 1) sfxVolume = std::min(100.0f, sfxVolume + 5.0f);
+                if (selectedVolumeBar == 0)
+                {
+                    bgmVolume = std::min(100.0f, bgmVolume + 5.0f);
+                    currentMusicVol++;
+                    if (currentMusicVol > 10) currentMusicVol = 10;
+                    gameAudio.setMusicVolume(currentMusicVol);
+                }
+                if (selectedVolumeBar == 1)
+                {
+                    sfxVolume = std::min(100.0f, sfxVolume + 5.0f);
+                    currentSFXVol++;
+                    if (currentSFXVol > 10) currentSFXVol = 10;
+                    gameAudio.setSFXVolume(currentSFXVol);
+                    gameAudio.playSFX(SoundEffect::MOVE);
+                }
             }
 
             if (event.key.code == sf::Keyboard::Return) {
@@ -197,10 +228,23 @@ void UIManager::update(float deltaTime) {
             transitionAlpha = 255.0f;
             currentState = nextState;
             isTransitioning = false;
+
+            // Báo hiệu reset game khi màn hình đen hoàn toàn để chuẩn bị sang màn chơi mới
+            if (currentState == GameState::Gameplay) {
+                extern void initGame();  // Khai báo mượn hàm từ file tetris.cpp
+                extern void initBoard();
+                extern void spawnBlock();
+                extern void block2Board();
+
+                initGame();   // Reset điểm số, cấp độ về 0
+                initBoard();  // Xóa sạch ma trận bàn cờ
+                spawnBlock(); // Sinh khối gạch mới tinh
+                block2Board();
+            }
         }
-        // Dùng lại sf::Uint8 hợp lệ trên SFML 2.x
         transitionOverlay.setFillColor(sf::Color(0, 0, 0, static_cast<sf::Uint8>(transitionAlpha)));
-    } else {
+    }
+    else {
         if (transitionAlpha > 0.0f) {
             transitionAlpha -= 600.0f * deltaTime;
             if (transitionAlpha < 0.0f) transitionAlpha = 0.0f;
@@ -215,7 +259,7 @@ void UIManager::draw(sf::RenderWindow& window) {
             window.draw(buttons[i].shape);
             window.draw(buttons[i].text);
         }
-    };
+        };
 
     if (currentState == GameState::MainMenu) {
         drawButtons(mainMenuButtons);

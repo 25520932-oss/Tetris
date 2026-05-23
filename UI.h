@@ -19,7 +19,6 @@ struct Button {
     sf::Text text;
     bool isSelected;
 
-    // Trở về hàm tạo mặc định bình thường của SFML 2.x
     Button() : isSelected(false) {}
 };
 
@@ -38,9 +37,10 @@ private:
     int currentPauseIdx;
     int currentSettingsIdx;
     int currentGameOverIdx;
-
     float bgmVolume;
     float sfxVolume;
+    int currentMusicVol ;
+    int currentSFXVol ;
     int selectedVolumeBar;
 
     int score;
@@ -62,7 +62,7 @@ public:
     void setScore(int s);
     void triggerTransition(GameState targetState);
 
-    // Bản 2.x truyền tham chiếu sf::Event thông thường
+   
     void handleEvent(const sf::Event& event, sf::RenderWindow& window);
     void update(float deltaTime);
     void draw(sf::RenderWindow& window);
@@ -72,5 +72,6 @@ public:
     float getBGMVolume() const { return bgmVolume; }
     float getSFXVolume() const { return sfxVolume; }
 };
-
+// Khai báo global để các file khác (như render.cpp) xài chung 1 object
+extern UIManager ui;
 #endif
