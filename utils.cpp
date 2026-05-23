@@ -14,5 +14,6 @@ void initGame() {
     score = 0;
     level = 1;
     linesCleared = 0;
+
     srand((unsigned)time(0));
 }

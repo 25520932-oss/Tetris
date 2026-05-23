@@ -1,7 +1,7 @@
 #ifndef UI_H
 #define UI_H
 
-#include "../sfml/include/SFML/Graphics.hpp"
+#include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -39,8 +39,8 @@ private:
     int currentGameOverIdx;
     float bgmVolume;
     float sfxVolume;
-    int currentMusicVol ;
-    int currentSFXVol ;
+    int currentMusicVol;
+    int currentSFXVol;
     int selectedVolumeBar;
 
     int score;
@@ -62,7 +62,7 @@ public:
     void setScore(int s);
     void triggerTransition(GameState targetState);
 
-   
+
     void handleEvent(const sf::Event& event, sf::RenderWindow& window);
     void update(float deltaTime);
     void draw(sf::RenderWindow& window);
@@ -75,3 +75,4 @@ public:
 // Khai báo global để các file khác (như render.cpp) xài chung 1 object
 extern UIManager ui;
 #endif
+

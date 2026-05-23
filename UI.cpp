@@ -1,4 +1,5 @@
 #include "ui.h"
+#include <iostream>
 #include "audio.h"
 
 UIManager::UIManager() {
@@ -20,32 +21,36 @@ UIManager::UIManager() {
 
 extern Audio gameAudio;
 
-bool UIManager::init(const std::string& fontPath, sf::RenderWindow& window) {
-    if (!font.loadFromFile(fontPath)) {
+bool UIManager::init(const std::string& /*fontPath*/, sf::RenderWindow& window) {
+    // Mượn font Arial đã load từ render.cpp — không load lại
+    extern sf::Font font;
+    this->font = font;
+    if (this->font.getInfo().family.empty()) {
+        std::cerr << "[UIManager] Font chua duoc load. Hay goi initRender() truoc.\n";
         return false;
     }
 
     sf::Vector2f winSize(static_cast<float>(window.getSize().x), static_cast<float>(window.getSize().y));
 
     // 1. Khởi tạo nút Main Menu
-    mainMenuButtons.push_back(createButton("START", {winSize.x / 2, 220}, {220, 50}));
-    mainMenuButtons.push_back(createButton("SETTINGS", {winSize.x / 2, 300}, {220, 50}));
-    mainMenuButtons.push_back(createButton("QUIT", {winSize.x / 2, 380}, {220, 50}));
+    mainMenuButtons.push_back(createButton("START", { winSize.x / 2, 220 }, { 220, 50 }));
+    mainMenuButtons.push_back(createButton("SETTINGS", { winSize.x / 2, 300 }, { 220, 50 }));
+    mainMenuButtons.push_back(createButton("QUIT", { winSize.x / 2, 380 }, { 220, 50 }));
     mainMenuButtons[0].isSelected = true;
 
     // 2. Khởi tạo nút Pause
-    pauseButtons.push_back(createButton("RESUME", {winSize.x / 2, 180}, {220, 50}));
-    pauseButtons.push_back(createButton("RESTART", {winSize.x / 2, 260}, {220, 50}));
-    pauseButtons.push_back(createButton("SETTINGS", {winSize.x / 2, 340}, {220, 50}));
-    pauseButtons.push_back(createButton("QUIT", {winSize.x / 2, 420}, {220, 50}));
+    pauseButtons.push_back(createButton("RESUME", { winSize.x / 2, 180 }, { 220, 50 }));
+    pauseButtons.push_back(createButton("RESTART", { winSize.x / 2, 260 }, { 220, 50 }));
+    pauseButtons.push_back(createButton("SETTINGS", { winSize.x / 2, 340 }, { 220, 50 }));
+    pauseButtons.push_back(createButton("QUIT", { winSize.x / 2, 420 }, { 220, 50 }));
     pauseButtons[0].isSelected = true;
 
     // 3. Khởi tạo nút Settings
-    settingsButtons.push_back(createButton("BACK", {winSize.x / 2, 420}, {220, 50}));
+    settingsButtons.push_back(createButton("BACK", { winSize.x / 2, 420 }, { 220, 50 }));
 
     // 4. Khởi tạo nút Game Over
-    gameOverButtons.push_back(createButton("RETRY", {winSize.x / 2, 320}, {220, 50}));
-    gameOverButtons.push_back(createButton("QUIT", {winSize.x / 2, 400}, {220, 50}));
+    gameOverButtons.push_back(createButton("RETRY", { winSize.x / 2, 320 }, { 220, 50 }));
+    gameOverButtons.push_back(createButton("QUIT", { winSize.x / 2, 400 }, { 220, 50 }));
     gameOverButtons[0].isSelected = true;
 
     gameOverTitle.setFont(font);
@@ -158,7 +163,7 @@ void UIManager::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
                     bgmVolume = std::max(0.0f, bgmVolume - 5.0f);
                 }
 
-                 
+
                 if (selectedVolumeBar == 1)
                 {
                     sfxVolume = std::max(0.0f, sfxVolume - 5.0f);
@@ -210,12 +215,13 @@ void UIManager::update(float deltaTime) {
             if (b.isSelected) {
                 b.shape.setFillColor(sf::Color(100, 100, 220));
                 b.shape.setOutlineColor(sf::Color::Cyan);
-            } else {
+            }
+            else {
                 b.shape.setFillColor(sf::Color(40, 40, 40));
                 b.shape.setOutlineColor(sf::Color(150, 150, 150));
             }
         }
-    };
+        };
 
     if (currentState == GameState::MainMenu) updateVisuals(mainMenuButtons);
     else if (currentState == GameState::Pause) updateVisuals(pauseButtons);

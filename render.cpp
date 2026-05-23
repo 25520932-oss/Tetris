@@ -4,6 +4,7 @@
 #include <string>
 
 extern  sf::RenderWindow window; //dung chung voi bien o file tetris de tranh loi tao 2 man hinh game
+
 sf::Font         font;
 
 
@@ -44,14 +45,10 @@ static void drawPanel(float px, float py, float pw, float ph,
 }
 
 void initRender() {
-    //window.create(sf::VideoMode(WIN_W, WIN_H), "Tetris",
-        //sf::Style::Titlebar | sf::Style::Close);
-    //window.setFramerateLimit(60);
-    //chay font chu tren da nen tang
+    // Thử load arial.ttf cạnh .exe trước, sau đó thử path hệ thống Windows
     if (!font.loadFromFile("arial.ttf"))
         if (!font.loadFromFile("C:/Windows/Fonts/arial.ttf"))
-            if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
-                font.loadFromFile("/System/Library/Fonts/Helvetica.ttc");
+            std::cerr << "[initRender] Khong tim thay arial.ttf!\n";
 }
 
 // renderBoard 
@@ -190,14 +187,11 @@ void renderStats() {
     }
 }
 
-// render
+// render — KHÔNG gọi clear()/display() ở đây nữa.
+// để tránh double-clear gây flicker.
 void render() {
-    window.clear(sf::Color(10, 20, 45));
-
-    renderBoard(); 
+    renderBoard();
     renderHoldBox();
     renderNextQueue();
     renderStats();
-
-    window.display();
 }
