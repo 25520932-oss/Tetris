@@ -15,6 +15,6 @@ void delay(int ms) {
 }
 
 // INIT GAME
-void initGame() {
-    srand(time(0));
-}
+//void initGame() {
+    //srand(time(0));
+//}

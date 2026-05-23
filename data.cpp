@@ -37,11 +37,11 @@ void initBoard() {
 // KHỞI TẠO 7 PIECE — new từng subclass, lưu vào pieces[]
 // Gọi một lần duy nhất trong main()
 void initPieces() {
-    pieces[I] = new IPiece();
+    /*pieces[I] = new IPiece();
     pieces[O] = new OPiece();
     pieces[T] = new TPiece();
     pieces[S] = new SPiece();
     pieces[Z] = new ZPiece();
     pieces[J] = new JPiece();
-    pieces[L] = new LPiece();
+    pieces[L] = new LPiece();*/
 }

@@ -4,44 +4,107 @@
 #include "input.h"
 #include "render.h"
 #include "utils.h"
+#include <SFML/Graphics.hpp>
+#include "ui.h"
+#include "audio.h"
+#include <algorithm>  
+
+sf::RenderWindow window(sf::VideoMode(800, 600), "Tetris Game - SFML 2.6.2");
 
 int main() {
+    //tu dong chay dung voi toc do quet cua may
+    window.setVerticalSyncEnabled(true);
 
-    // KHỞI TẠO
-    initGame();       // seed random (utils.cpp)
-    initBoard();      // tạo board + tường (data.cpp)
-    initPieces();     // BUG FIX: đổi initBlocks() → initPieces() (tên đúng trong data.cpp)
-
-    spawnBlock();     // block đầu tiên
-    block2Board();    // vẽ block đầu tiên lên board
-
-    // GAME LOOP
-    while (true) {
-
-        render();
-
-        // INPUT
-        processInput();
-
-        // LOGIC RƠI
-        if (!moveBlock(0, 1)) {
-            // block không di chuyển được → khóa tại chỗ (block2Board đã gọi trong moveBlock)
-            removeLine();
-
-            spawnBlock();
-
-            // Kiểm tra game over TRƯỚC khi vẽ block mới lên board
-            // Nếu check sau block2Board() thì luôn thấy ô bị chiếm → false positive
-            if (isGameOver()) break;
-            block2Board(); // vẽ block mới lên board
-        }
-
-        // DELAY — tốc độ tăng dần theo level (tối thiểu 80ms)
-        int speed = max(80, 300 - level * 20);
-        delay(speed);
+    UIManager ui;
+    if (!ui.init("arial.ttf", window)) {
+        return -1;
     }
 
-    gotoxy(23, 0);
-    cout << "GAME OVER!" << endl;
-    return 0;
+    initGame();       // seed random
+    initBoard();      // tạo board + tường
+    initPieces();     // tạo 7 piece objects
+    initRender();     // tạo SFML window + load font
+
+    gameAudio.loadMedia();
+    gameAudio.setMusicVolume(7);
+    gameAudio.setSFXVolume(8);
+    gameAudio.playBGM();
+
+    spawnBlock();
+    block2Board();
+
+    sf::Clock gameClock;
+    float dropTimer = 0.0f;
+
+    // Bộ đếm thời gian quản lý việc đè phím di chuyển
+    float sideMoveTimer = 0.0f;
+    bool isKeyHeld = false;
+
+    while (window.isOpen()) {
+        float deltaTime = gameClock.restart().asSeconds();
+
+        sf::Event event;
+        // 1. VÒNG LẶP SỰ KIỆN 
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+
+            if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::Escape) {
+                    if (ui.getCurrentState() == GameState::Gameplay) {
+                        ui.setCurrentState(GameState::Pause);
+                    }
+                }
+            }
+
+            if (ui.getCurrentState() == GameState::Gameplay) {
+                processInput(event);
+            }
+
+            // Gửi sự kiện sang UI xử lý nút bấm Menu
+            ui.handleEvent(event, window);
+        }
+
+        // ─── CẬP NHẬT TRẠNG THÁI UI ───
+        ui.update(deltaTime);
+
+        // LOGIC GAMEPLAY TETRIS 
+        if (ui.getCurrentState() == GameState::Gameplay) {
+
+            dropTimer += deltaTime;
+            float speedInSeconds = std::max(80, 400 - level * 25) / 1000.0f;
+
+            if (dropTimer >= speedInSeconds) {
+                dropTimer = 0.0f;
+
+                
+                if (!moveBlock(0, 1)) {
+                    lockBlock();
+                    int cleared = removeLine();
+                    spawnBlock();
+
+                    if (isGameOver()) {
+                        ui.triggerTransition(GameState::GameOver);
+                        ui.setScore(score);
+                        gameAudio.playSFX(SoundEffect::GAME_OVER);
+                    }
+                    else {
+                        block2Board();
+                    }
+                    (void)cleared;
+                }
+            }
+        }
+
+        // ─── RENDERING ───
+        window.clear(sf::Color(10, 20, 45));
+        if (ui.getCurrentState() == GameState::Gameplay) {
+            render();
+        }
+        else {
+            ui.draw(window);
+        }
+        window.display();
+    }
 }
