@@ -14,7 +14,7 @@ bool Audio::loadMedia() {
     bool success = true;
 
     // Dùng openFromFile cho nhạc nền (Stream trực tiếp)
-    if (!bgMusic.openFromFile("Path_of_sound_tetris/Sound/Theme.wav")) {
+    if (!bgMusic.openFromFile("Path_of_sound_tetris/Sound/Theme_Tetris.wav")) {
         std::cerr << "Loi load nhac nen!\n";
         success = false;
     }
