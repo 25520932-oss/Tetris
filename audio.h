@@ -49,9 +49,9 @@ public:
     void playSFX(SoundEffect effect);
     void close();
     
-    // SFML dùng thang điểm volume từ 0 đến 100 (float)
-    void setMusicVolume(float volume);
-    void setSFXVolume(float volume);
+    // SFML dùng thang điểm volume từ 0 đến 100 
+    void setMusicVolume(int volume);
+    void setSFXVolume(int volume);
 };
 extern Audio gameAudio;
 #endif
