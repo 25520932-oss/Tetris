@@ -3,8 +3,7 @@
 #include "piece_class.h"
 #include <string>
 
-extern  sf::RenderWindow window; //dung chung voi bien o file tetris de tranh loi tao 2 man hinh game
-
+sf::RenderWindow window;
 sf::Font         font;
 
 
@@ -45,10 +44,14 @@ static void drawPanel(float px, float py, float pw, float ph,
 }
 
 void initRender() {
-    // Thử load arial.ttf cạnh .exe trước, sau đó thử path hệ thống Windows
+    window.create(sf::VideoMode(WIN_W, WIN_H), "Tetris",
+        sf::Style::Titlebar | sf::Style::Close);
+    window.setFramerateLimit(60);
+    //chay font chu tren da nen tang
     if (!font.loadFromFile("arial.ttf"))
         if (!font.loadFromFile("C:/Windows/Fonts/arial.ttf"))
-            std::cerr << "[initRender] Khong tim thay arial.ttf!\n";
+            if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
+                font.loadFromFile("/System/Library/Fonts/Helvetica.ttc");
 }
 
 // renderBoard 
@@ -187,11 +190,14 @@ void renderStats() {
     }
 }
 
-// render — KHÔNG gọi clear()/display() ở đây nữa.
-// để tránh double-clear gây flicker.
+// render
 void render() {
-    renderBoard();
+    window.clear(sf::Color(10, 20, 45));
+
+    renderBoard(); 
     renderHoldBox();
     renderNextQueue();
     renderStats();
+
+    window.display();
 }
